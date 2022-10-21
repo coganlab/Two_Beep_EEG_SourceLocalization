@@ -1,0 +1,11 @@
+pytest
+bids>=0.0
+pandas
+joblib
+matplotlib
+scipy
+numpy
+mne-bids
+mne
+autoreject
+pyvista
