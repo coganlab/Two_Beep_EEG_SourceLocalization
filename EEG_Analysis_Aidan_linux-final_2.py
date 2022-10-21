@@ -1,3 +1,4 @@
+#%%
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
@@ -21,11 +22,16 @@ from os.path import join
 from os import chdir
 
 
+#mne.viz.set_3d_options(antialias=False, depth_peeling = False, smooth_shading = False)
+#mne.viz.set_3d_backend('pyvista')
+
 if os.name == 'posix': # linux
+    D_Drive = '/mnt/d/Aidan'
     root_dir = '~'
     SUBJECTS_DIR = os.getenv('SUBJECTS_DIR')
     FREESURFER_HOME = os.getenv('FREESURFER_HOME')
 elif os.name == 'nt': # windows
+    D_Drive = 'D:\Aidan'
     root_dir = join("C:","Users","aar40","AppData","Local","Packages",
                            "CanonicalGroupLimited.Ubuntu22.04LTS_79rhkp1fndgsc","LocalState","rootfs")
     FREESURFER_HOME = join(root_dir, "usr", "local", "freesurfer", "7.3.2")
@@ -37,7 +43,7 @@ mne.viz.set_3d_options(antialias=False)
 mne.viz.set_3d_backend('pyvista')
 
 #cd D:\Aidan
-# %matplotlib qt
+%matplotlib qt
 
 #D:/Aidan/E1/BrainVision_Recorder/E1_TwoBeeps.vhdr
 #124_Ch_Test.bvef
@@ -84,9 +90,8 @@ def make_montage():
 
     """
     # have to be in same directory as the file ur looking at to access b/c MNE
-    # os.chdir('D:\Aidan') 
-    os.chdir('/mnt/d/Aidan') 
-
+    os.chdir(D_Drive)
+    
     
     montage_fname = input ('Are you using a custom (C) or default (D) montage/electrode placement ')
     subj_num = input('what subject # are you analyzing: ')
@@ -113,8 +118,7 @@ def make_montage():
         montage = mne.channels.read_custom_montage(montage_name)
     elif (montage_fname == 'C'):
         #load custom montage / electrode position
-        montage_name = traverse('/CapTrak', subj, subj, '.bvct')
-        print(montage_name)
+        montage_name = traverse('CapTrak', subj, subj, '.bvct')
         montage = mne.channels.read_dig_captrak(montage_name)
     else:
         print('invalid input')
@@ -124,7 +128,7 @@ def make_montage():
     
     vhdr1 = 'TwoBeeps' #change these to change what type of file you're analyzinbg
     vhdr2 = '.vhdr'
-    vhdr_fname = traverse('/BrainVision_Recorder', subj, vhdr1, vhdr2)
+    vhdr_fname = traverse(os.sep + 'BrainVision_Recorder', subj, vhdr1, vhdr2)
    # vhdr_fname = ''
 
     #vhdr_path = 'D:\Aidan/' + subj + '/BrainVision_Recorder/'     
@@ -156,13 +160,13 @@ def make_montage():
     return montage, raw
 
 def traverse(where, subj, vhdr1, vhdr2):
+    global vhdr_fname_1
     # for dirpath, dirnames, filenames in os.walk('D:\Aidan/' + subj + where):
-    for dirpath, dirnames, filenames in os.walk('/mnt/d/Aidan/' + subj + where):
+    for dirpath, dirnames, filenames in os.walk(D_Drive + os.sep + subj + os.sep + where):
         for name in filenames:
             if vhdr1 in name:
                 if vhdr2 in name:
-                    global vhdr_fname_1
-                    vhdr_fname_1 = dirpath + '/' + name 
+                    vhdr_fname_1 = dirpath + os.sep + name 
                     print(vhdr_fname_1)
                     print(type(vhdr_fname_1))
                     return vhdr_fname_1
@@ -682,7 +686,7 @@ def make_average_stc(subject_list):
     return average_lh, average_rh
 
 
-if __name__ == "__main__":
+#if __name__ == "__main__":
     '''
     main function --> run code in terminal/qt console
     type %matplotlib qt, to make sure plots disp separately
@@ -690,9 +694,10 @@ if __name__ == "__main__":
     then run each subjective uncommented line on its own in order
     '''
     
+    #%%
     montage, raw = make_montage()
 
-    
+    #%%
     raw2 = set_data(raw, montage) #common average reference
     # try: 
     #     sleeper()
@@ -700,28 +705,34 @@ if __name__ == "__main__":
     #     print('\n\nKeyboard exception recieved. Exiting')
     #     exit()
     
-    #set raw data to custom montage 
+    #%%set raw data to custom montage 
     raw2.set_montage(montage)
+    #%%
     raw2.save(pathlib.Path('/mnt/d/Aidan/' + subj + '/Digitization') / 'Captrak_Digitization.fif', overwrite = True)
 
+    #%%
     epochs = erp(raw2, montage)
     
-    #AUTOREJ ROUTE:
+    #%%AUTOREJ ROUTE:
     epochs_ar = autorej(epochs)
+    #%%
     ica = ICA_auto_rej(epochs_ar)
+    #%%
     ica.exclude = [17,19,6] # MANUAL INPUT
+    #%%
     reconst_evoked, reconst_raw = EOG_check_ar(epochs_ar, ica)
 
-    mne.write_evokeds('/mnt/d/Aidan/Grand_Averages/Epochs/' + subj + '_raw_for_ave.fif', reconst_evoked) #to do co-registration, have to do file path so gui.coreg can take as input
-    cd grand_averages
-    cd epochs
+    #%%
+    evoked_path = join(D_Drive,'Grand_Averages','Epochs',subj + '_raw_for_ave.fif')
+    mne.write_evokeds(evoked_path, reconst_evoked) #to do co-registration, have to do file path so gui.coreg can take as input
+    os.chdir("grand_averages" + os.sep + "epochs")
     reconst_raw.save(subj + '_reconst_raw.fif')
-    cd ..
-    cd ..
+    os.chdir(D_Drive)
     # print("wait")
     # wait = input('Press a key to continue: ')
     # print("continue")
     
+    #%%
     ica = ica_func(raw2)
     ica.plot_sources(raw2, show_scrollbars=True)     # to plot ICA vs time
 

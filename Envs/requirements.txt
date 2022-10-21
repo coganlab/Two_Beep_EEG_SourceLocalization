@@ -9,3 +9,4 @@ mne-bids
 mne
 autoreject
 pyvista
+pyvistaqt
