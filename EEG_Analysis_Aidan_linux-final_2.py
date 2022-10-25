@@ -32,10 +32,12 @@ if os.name == 'posix': # linux
     FREESURFER_HOME = os.getenv('FREESURFER_HOME')
 elif os.name == 'nt': # windows
     D_Drive = 'D:\Aidan'
-    root_dir = join("C:","Users","aar40","AppData","Local","Packages",
+    root_dir = join("C:\\","Users","aar40","AppData","Local","Packages",
                            "CanonicalGroupLimited.Ubuntu22.04LTS_79rhkp1fndgsc","LocalState","rootfs")
     FREESURFER_HOME = join(root_dir, "usr", "local", "freesurfer", "7.3.2")
     SUBJECTS_DIR = join(FREESURFER_HOME,'subjects')
+    os.environ['SUBJECTS_DIR'] = SUBJECTS_DIR
+    os.environ['FREESURFER_HOME'] = FREESURFER_HOME
 else:
     raise SystemError('Unknown system os')
 
@@ -717,8 +719,12 @@ def make_average_stc(subject_list):
     epochs_ar = autorej(epochs)
     #%%
     ica = ICA_auto_rej(epochs_ar)
+
     #%%
-    ica.exclude = [17,19,6] # MANUAL INPUT
+    ica.plot_sources(epochs_ar, show_scrollbars=True)     # to plot ICA vs time
+
+    #%%
+    ica.exclude = [0,1,3,6,22,47,0,1,3,6,22,47] # MANUAL INPUT
     #%%
     reconst_evoked, reconst_raw = EOG_check_ar(epochs_ar, ica)
 
