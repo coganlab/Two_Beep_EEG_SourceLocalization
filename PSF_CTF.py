@@ -87,7 +87,7 @@ cov = mne.compute_covariance(epochs, tmin=None, tmax=0.)
 #*MAKE SURE YOU KNOW WHAT YOUR SUBJECT # IS*
 
 
---** ISSUE WITH INVERSE OPERATOR** --> 
+#-- ISSUE WITH INVERSE OPERATOR** --> 
 mne.convert_forward_solution(fwd, surf_ori=True,
                              force_fixed=True, copy=False)
 
@@ -111,8 +111,7 @@ stc_inv = apply_inverse(evoked_gen, inv_reloaded, lambda2, method='eLORETA')
 stc_inv.plot(surface = 'inflated',hemi = 'split', smoothing_steps = 5)
 
 
-
---resolution MATRIX:
+# --resolution MATRIX:
 
 from mne.minimum_norm import (make_inverse_resolution_matrix, get_cross_talk,
                               get_point_spread)
@@ -218,7 +217,7 @@ brain_ctf_rh.add_foci(vert_max_ctf_rh, coords_as_verts=True, scale_factor=1.,
                    hemi='rh', color='black')
 
 
------------------------- COMPARING DIFFERENT METHODS -------------------
+# ------------------------ COMPARING DIFFERENT METHODS -------------------
 
 from mne.minimum_norm import make_inverse_resolution_matrix
 from mne.minimum_norm import resolution_metrics
