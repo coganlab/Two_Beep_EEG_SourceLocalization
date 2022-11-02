@@ -25,6 +25,9 @@ from os import chdir
 #mne.viz.set_3d_options(antialias=False, depth_peeling = False, smooth_shading = False)
 #mne.viz.set_3d_backend('pyvista')
 
+# UN COMMENT THE ONE BELOW NORMALLY
+# export FS_LICENSE='/usr/local/freesurfer/7.3.2/license.txt'
+
 if os.name == 'posix': # linux
     D_Drive = '/mnt/d/Aidan'
     root_dir = '~'
@@ -36,8 +39,10 @@ elif os.name == 'nt': # windows
                            "CanonicalGroupLimited.Ubuntu22.04LTS_79rhkp1fndgsc","LocalState","rootfs")
     FREESURFER_HOME = join(root_dir, "usr", "local", "freesurfer", "7.3.2")
     SUBJECTS_DIR = join(FREESURFER_HOME,'subjects')
-    os.environ['SUBJECTS_DIR'] = SUBJECTS_DIR
-    os.environ['FREESURFER_HOME'] = FREESURFER_HOME
+    mne.set_config(SUBJECTS_DIR, FREESURFER_HOME + os.sep + 'subjects',  set_env=True)
+    mne.set_config(FREESURFER_HOME, FREESURFER_HOME ,  set_env=True)
+    #os.environ['SUBJECTS_DIR'] = SUBJECTS_DIR
+    #os.environ['FREESURFER_HOME'] = FREESURFER_HOME
 else:
     raise SystemError('Unknown system os')
 
